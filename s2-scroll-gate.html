@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>S2 · Scroll Gate — UX Behavior Test Suite</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap');
+
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --surface2: #1a1a28;
+    --border: #2a2a3f;
+    --accent: #e8ff47;
+    --accent2: #7b5cf0;
+    --accent3: #ff4f6e;
+    --text: #e0e0f0;
+    --text-muted: #6b6b8a;
+    --success: #3dffa0;
+    --error: #ff4f6e;
+    --mono: 'Space Mono', monospace;
+    --sans: 'Syne', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.4;
+  }
+
+  header {
+    padding: 2rem 3rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    position: sticky;
+    top: 0;
+    background: rgba(10,10,15,0.92);
+    backdrop-filter: blur(12px);
+    z-index: 100;
+  }
+
+  .lab-badge {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    background: var(--accent);
+    color: #000;
+    padding: 3px 8px;
+    letter-spacing: 0.1em;
+    font-weight: 700;
+  }
+
+  header h1 {
+    font-size: 1.1rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--text);
+  }
+
+  header p {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    margin-left: auto;
+  }
+
+  .nav-tabs {
+    display: flex;
+    gap: 0;
+    padding: 0 3rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    overflow-x: auto;
+  }
+
+  .nav-tab {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    padding: 1rem 1.5rem;
+    cursor: pointer;
+    color: var(--text-muted);
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    transition: all 0.15s;
+    letter-spacing: 0.05em;
+    user-select: none;
+    text-decoration: none;
+    display: block;
+  }
+
+  .nav-tab:hover { color: var(--text); }
+  .nav-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  .scenario-pane {
+    padding: 3rem;
+    max-width: 900px;
+    margin: 0 auto;
+    animation: fadeIn 0.3s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .scenario-header { margin-bottom: 2.5rem; }
+
+  .scenario-num {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    color: var(--accent);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+
+  .scenario-title {
+    font-size: 1.8rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    margin-bottom: 0.75rem;
+  }
+
+  .task-prompt {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 0.75rem 1.25rem;
+    font-family: var(--mono);
+    font-size: 0.8rem;
+  }
+
+  .task-prompt span:first-child {
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  .stage {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 3rem;
+    min-height: 280px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .event-log {
+    background: #080810;
+    border: 1px solid var(--border);
+    padding: 1.25rem;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    max-height: 140px;
+    overflow-y: auto;
+    margin-top: 1rem;
+  }
+
+  .event-log-title {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    letter-spacing: 0.1em;
+    margin-bottom: 0.5rem;
+    margin-top: 1.5rem;
+  }
+
+  .log-entry {
+    padding: 2px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    display: flex;
+    gap: 1rem;
+  }
+
+  .log-ts { color: var(--text-muted); }
+  .log-event { color: var(--accent); }
+  .log-detail { color: var(--text); opacity: 0.8; }
+
+  .reset-btn {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    padding: 6px 14px;
+    cursor: pointer;
+    letter-spacing: 0.08em;
+    transition: all 0.15s;
+    margin-top: 0.75rem;
+  }
+
+  .reset-btn:hover { border-color: var(--text-muted); color: var(--text); }
+
+  /* Scenario 2 specific */
+  .s2-scrollable {
+    width: 100%;
+    height: 320px;
+    overflow-y: auto;
+    border: 1px solid var(--border);
+    position: relative;
+    scroll-behavior: smooth;
+  }
+
+  .s2-content {
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .s2-false-cue {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: rgba(232,255,71,0.06);
+    border: 1px solid rgba(232,255,71,0.2);
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--accent);
+    cursor: pointer;
+  }
+
+  .s2-false-cue:hover { background: rgba(232,255,71,0.1); }
+
+  .s2-paragraph {
+    font-size: 0.85rem;
+    line-height: 1.7;
+    color: var(--text-muted);
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  #continue-btn-wrapper {
+    display: none;
+    justify-content: center;
+    padding: 2rem 0 1rem;
+  }
+
+  #continue {
+    font-family: var(--sans);
+    font-weight: 600;
+    padding: 0.75rem 2.5rem;
+    background: var(--accent);
+    color: #000;
+    border: none;
+    cursor: pointer;
+    font-size: 0.9rem;
+    letter-spacing: 0.05em;
+    transition: transform 0.1s;
+  }
+
+  #continue:hover { transform: scale(1.03); }
+  #continue:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .s2-scroll-indicator {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    text-align: center;
+    padding: 0.5rem;
+  }
+
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 2rem 0;
+  }
+
+  .event-log::-webkit-scrollbar { width: 4px; }
+  .event-log::-webkit-scrollbar-track { background: transparent; }
+  .event-log::-webkit-scrollbar-thumb { background: var(--border); }
+
+  .s2-scrollable::-webkit-scrollbar { width: 4px; }
+  .s2-scrollable::-webkit-scrollbar-track { background: transparent; }
+  .s2-scrollable::-webkit-scrollbar-thumb { background: var(--border); }
+
+  #toast {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    background: var(--success);
+    color: #000;
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.75rem 1.5rem;
+    transform: translateY(80px);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    z-index: 9998;
+    letter-spacing: 0.08em;
+  }
+
+  #toast.show { transform: translateY(0); opacity: 1; }
+</style>
+</head>
+<body>
+
+<header>
+  <span class="lab-badge">LAB</span>
+  <h1>UX Behavior Test Suite</h1>
+  <p>5 scenarios · interaction capture</p>
+</header>
+
+<nav class="nav-tabs">
+  <a class="nav-tab" href="s1-redundant-submit.html">S1 · Redundant Submit</a>
+  <a class="nav-tab active" href="s2-scroll-gate.html">S2 · Scroll Gate</a>
+  <a class="nav-tab" href="s3-hover-reveal.html">S3 · Hover Reveal</a>
+  <a class="nav-tab" href="s4-dom-mismatch.html">S4 · DOM Mismatch</a>
+  <a class="nav-tab" href="s5-delayed-feedback.html">S5 · Delayed Feedback</a>
+</nav>
+
+<div class="scenario-pane">
+  <div class="scenario-header">
+    <div class="scenario-num">SCENARIO 02 · EXPLORATION STRATEGY</div>
+    <div class="scenario-title">Scroll-Gated Discovery</div>
+    <div class="task-prompt"><span>TASK</span> "Find and click 'Continue'."</div>
+  </div>
+
+  <div class="stage" style="padding:1.5rem; align-items:stretch; justify-content:flex-start; flex-direction:column;">
+    <!-- False visual cue -->
+    <div class="s2-false-cue" onclick="s2log('click','False cue (arrow box) → NO EFFECT')"
+         onmouseenter="s2log('hover','False cue arrow')">
+      <span>▼</span>
+      <span>Continue below ↓</span>
+    </div>
+
+    <div class="divider" style="margin:0.75rem 0;"></div>
+
+    <div class="s2-scrollable" id="s2-scroll" onscroll="s2onScroll()">
+      <div class="s2-content">
+        <div class="s2-paragraph">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.</div>
+        <div class="s2-paragraph">Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</div>
+        <div class="s2-paragraph">Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium totam rem aperiam. Eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.</div>
+        <div class="s2-paragraph">Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione sequi nesciunt neque porro quisquam est.</div>
+        <div class="s2-paragraph">At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati.</div>
+        <div class="s2-paragraph">Itaque earum rerum hic tenetur a sapiente delectus, ut aut reiciendis voluptatibus maiores alias consequatur aut perferendis doloribus asperiores repellat.</div>
+
+        <div id="continue-btn-wrapper" style="display:flex">
+          <button id="continue"
+            onclick="s2clickContinue()"
+            onmouseenter="s2log('hover','Continue button')">Continue</button>
+        </div>
+
+        <div class="s2-scroll-indicator" id="s2-scroll-pct">Scroll: 0%</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="event-log-title">EVENT LOG</div>
+  <div class="event-log" id="s2-log"></div>
+  <button class="reset-btn" onclick="s2reset()">RESET SCENARIO</button>
+</div>
+
+<div id="toast"></div>
+
+<script>
+function ts() {
+  const d = new Date();
+  return d.toTimeString().split(' ')[0] + '.' + String(d.getMilliseconds()).padStart(3,'0');
+}
+
+function addLog(logId, event, detail) {
+  const log = document.getElementById(logId);
+  const entry = document.createElement('div');
+  entry.className = 'log-entry';
+  entry.innerHTML = `<span class="log-ts">${ts()}</span><span class="log-event">${event}</span><span class="log-detail">${detail}</span>`;
+  log.prepend(entry);
+}
+
+function clearLog(id) { document.getElementById(id).innerHTML = ''; }
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+let s2revealed = false;
+let s2fullyScrolled = false;
+
+function s2log(ev, detail) { addLog('s2-log', ev, detail); }
+
+function s2onScroll() {
+  const el = document.getElementById('s2-scroll');
+  const pct = Math.round((el.scrollTop / (el.scrollHeight - el.clientHeight)) * 100);
+  document.getElementById('s2-scroll-pct').textContent = 'Scroll: ' + pct + '%';
+  s2log('scroll', pct + '% scrolled');
+
+  if (pct >= 70 && !s2revealed) {
+    s2revealed = true;
+    const wrapper = document.getElementById('continue-btn-wrapper');
+    wrapper.style.display = 'flex';
+    s2log('inject', 'Continue button injected at 70% scroll');
+  }
+
+  if (pct >= 100) {
+    s2fullyScrolled = true;
+    const btn = document.getElementById('continue');
+    if (btn) btn.disabled = false;
+  }
+}
+
+function s2clickContinue() {
+  if (!s2fullyScrolled) {
+    s2log('click', 'Continue → NOT YET (scroll to 100%)');
+  } else {
+    s2log('click', 'Continue → CORRECT');
+    showToast('✓ Continue clicked');
+  }
+}
+
+function s2reset() {
+  s2revealed = false;
+  s2fullyScrolled = false;
+  const wrapper = document.getElementById('continue-btn-wrapper');
+  wrapper.style.display = 'none';
+  const el = document.getElementById('s2-scroll');
+  el.scrollTop = 0;
+  document.getElementById('s2-scroll-pct').textContent = 'Scroll: 0%';
+  clearLog('s2-log');
+}
+</script>
+</body>
+</html>
