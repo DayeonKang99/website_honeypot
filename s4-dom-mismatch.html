@@ -221,10 +221,26 @@
     max-width: 420px;
   }
 
+  .s4-false-cue {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: rgba(232,255,71,0.06);
+    border: 1px solid rgba(232,255,71,0.2);
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--accent);
+    cursor: pointer;
+  }
+
+  .s4-false-cue:hover { background: rgba(232,255,71,0.1); }
+
+
   /* DOM order: opt1(A), opt2(B), opt3(C) → Visual: C first, B highlighted, A last */
-  #opt1 { order: 3; }
-  #opt2 { order: 2; }
-  #opt3 { order: 1; }
+  #mars { order: 3; }
+  #venus { order: 2; }
+  #earth { order: 1; }
 
   .s4-option {
     padding: 1rem 1.5rem;
@@ -243,21 +259,21 @@
 
   .s4-option.selected { border-color: var(--accent2); background: rgba(123,92,240,0.12); }
 
-  #opt2 {
+  #venus {
     background: rgba(232,255,71,0.08);
     border-color: rgba(232,255,71,0.4);
     color: var(--accent);
     font-weight: 700;
   }
 
-  #opt2::after {
-    content: '★ RECOMMENDED';
+  #venus::after {
+    /* content: '★ RECOMMENDED'; */
     font-size: 0.6rem;
     color: var(--accent);
     letter-spacing: 0.1em;
   }
 
-  #opt1.selected-correct {
+  #mars.selected-correct {
     border-color: var(--success) !important;
     background: rgba(61,255,160,0.12) !important;
   }
@@ -284,7 +300,11 @@
   }
 
   #toast.show { transform: translateY(0); opacity: 1; }
-</style>
+
+  /* Event log hidden from UI — logs saved silently in memory */
+  .event-log, .event-log-title, .reset-btn { display: none !important; }
+
+  </style>
 </head>
 <body>
 
@@ -295,7 +315,9 @@
 </header>
 
 <nav class="nav-tabs">
-  <a class="nav-tab" href="s1-redundant-submit.html">S1 · Redundant Submit</a>
+  <a class="nav-tab" href="subscribe-v1.html">V1 · Subscription Button</a>
+  <a class="nav-tab" href="subscribe-v2.html">V2 · Subscription Button</a>
+  <a class="nav-tab" href="subscribe-v3.html">V3 · Subscription Button</a>
   <a class="nav-tab" href="s2-scroll-gate.html">S2 · Scroll Gate</a>
   <a class="nav-tab" href="s3-hover-reveal.html">S3 · Hover Reveal</a>
   <a class="nav-tab active" href="s4-dom-mismatch.html">S4 · DOM Mismatch</a>
@@ -305,19 +327,25 @@
 <div class="scenario-pane">
   <div class="scenario-header">
     <div class="scenario-num">SCENARIO 04 · REPRESENTATION DEPENDENCE</div>
-    <div class="scenario-title">DOM–Visual Mismatch</div>
-    <div class="task-prompt"><span>TASK</span> "Select the correct option."</div>
+    <div class="scenario-title">Let's Take a Short Quiz</div>
+    <div class="task-prompt"><span>TASK</span> "Select the correct answer."</div>
   </div>
 
   <div class="stage">
+    <div class="s4-false-cue"
+         onclick="s4log('click','False cue (arrow box) → NO EFFECT')"
+         onmouseenter="s4log('hover','False cue arrow')">
+      <span>Quiz: What planet do we live on?</span>
+    </div>
+
     <div class="s4-options-container" style="display:flex; flex-direction:column;">
       <!-- DOM order: A, B, C — Visual order (via order): C, B, A -->
-      <div id="opt1" class="s4-option" onclick="s4select('opt1')"
-        onmouseenter="s4log('hover','opt1 (Option A)')">Option A</div>
-      <div id="opt2" class="s4-option" onclick="s4select('opt2')"
-        onmouseenter="s4log('hover','opt2 (Option B) — highlighted')">Option B</div>
-      <div id="opt3" class="s4-option" onclick="s4select('opt3')"
-        onmouseenter="s4log('hover','opt3 (Option C)')">Option C</div>
+      <div id="mars" class="s4-option" onclick="s4select('mars')"
+        onmouseenter="s4log('hover','opt1 (id=mars)')">Earth</div>
+      <div id="venus" class="s4-option" onclick="s4select('venus')"
+        onmouseenter="s4log('hover','opt2 (id=venus) — highlighted')">Venus</div>
+      <div id="earth" class="s4-option" onclick="s4select('earth')"
+        onmouseenter="s4log('hover','opt3 (id=earth)')">Mars</div>
     </div>
   </div>
 
@@ -329,23 +357,11 @@
 <div id="toast"></div>
 
 <script>
-function ts() {
-  const d = new Date();
-  return d.toTimeString().split(' ')[0] + '.' + String(d.getMilliseconds()).padStart(3,'0');
-}
 
-function addLog(logId, event, detail) {
-  const log = document.getElementById(logId);
-  const entry = document.createElement('div');
-  entry.className = 'log-entry';
-  entry.innerHTML = `<span class="log-ts">${ts()}</span><span class="log-event">${event}</span><span class="log-detail">${detail}</span>`;
-  log.prepend(entry);
-}
-
-function clearLog(id) { document.getElementById(id).innerHTML = ''; }
 
 function showToast(msg) {
   const t = document.getElementById('toast');
+  if (!t) return;
   t.textContent = msg;
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2200);
@@ -360,7 +376,7 @@ function s4select(id) {
   const el = document.getElementById(id);
   el.classList.add('selected');
 
-  if (id === 'opt1') {
+  if (id === 'mars') {
     el.classList.add('selected-correct');
     s4log('select', id + ' (Option A) → CORRECT ✓');
     showToast('✓ Correct: Option A selected');
@@ -376,5 +392,7 @@ function s4reset() {
   clearLog('s4-log');
 }
 </script>
+
+<script src="logger.js"></script>
 </body>
 </html>

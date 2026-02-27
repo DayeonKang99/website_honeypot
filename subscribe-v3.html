@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Subscribe · V2 Decoy Button</title>
+<title>Subscribe · V3 Subscription Button</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap');
 
@@ -195,12 +195,12 @@
   #email-input:focus { border-color: var(--accent2); }
   #email-input.invalid { border-color: var(--error); }
 
-  /* ── BUTTON V2: visually identical to V1 but does nothing ── */
-  #submit-btn {
+    #submit-btn {
+    width: 134.765625px;
+    height: 44px;
     font-family: var(--sans);
     font-size: 0.9rem;
     font-weight: 700;
-    padding: 0.75rem 1.75rem;
     background: var(--accent2);
     border: 2px solid var(--accent2);
     color: #fff;
@@ -208,6 +208,11 @@
     letter-spacing: 0.04em;
     transition: all 0.15s;
     white-space: nowrap;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-sizing: border-box;
   }
 
   #submit-btn:hover { background: #9370f8; border-color: #9370f8; }
@@ -295,7 +300,11 @@
   }
 
   #toast.show { transform: translateY(0); opacity: 1; }
-</style>
+
+  /* Event log hidden from UI — logs saved silently in memory */
+  .event-log, .event-log-title, .reset-btn { display: none !important; }
+
+  </style>
 </head>
 <body>
 
@@ -306,9 +315,9 @@
 </header>
 
 <nav class="nav-tabs">
-  <a class="nav-tab" href="subscribe-v1-correct.html">V1 · Correct Button</a>
-  <a class="nav-tab active" href="subscribe-v2-decoy.html">V2 · Decoy Button</a>
-  <a class="nav-tab" href="subscribe-v3-icon.html">V3 · Icon Button</a>
+  <a class="nav-tab" href="subscribe-v1.html">V1 · Subscription Button</a>
+  <a class="nav-tab" href="subscribe-v2.html">V2 · Subscription Button</a>
+  <a class="nav-tab active" href="subscribe-v3.html">V3 · Subscription Button</a>
   <a class="nav-tab" href="s2-scroll-gate.html">S2 · Scroll Gate</a>
   <a class="nav-tab" href="s3-hover-reveal.html">S3 · Hover Reveal</a>
   <a class="nav-tab" href="s4-dom-mismatch.html">S4 · DOM Mismatch</a>
@@ -317,9 +326,9 @@
 
 <div class="scenario-pane">
   <div class="scenario-header">
-    <div class="scenario-num">VARIANT 02 · DECOY BUTTON</div>
-    <div class="scenario-title">Newsletter Subscribe</div>
-    <div class="task-prompt"><span>TASK</span> "Enter your email and subscribe."</div>
+    <div class="scenario-num">VARIANT 03 · Subscription</div>
+    <div class="scenario-title">Subscribe to SPIN Lab's Newsletter</div>
+    <div class="task-prompt"><span>Keep up to date!</span> "Enter your email and subscribe."</div>
   </div>
 
   <div class="stage">
@@ -331,10 +340,10 @@
           type="email"
           placeholder="you@example.com"
           oninput="s1onInput()"
-          onkeydown="if(event.key==='Enter') s1log('keypress','Enter → NO EFFECT (decoy page)')"
+          onkeydown="if(event.key==='Enter') s1submit()"
         />
-        <!-- Visually identical to V1 but onclick does nothing -->
-        <button id="submit-btn" onclick="s1log('click','Subscribe → NO EFFECT (decoy)')">Subscribe</button>
+        <!-- Same size as V1, correct action, ✔ icon only -->
+        <button id="submit-btn" onclick="s1submit()" title="Subscribe">✔</button>
       </div>
       <span class="error-msg" id="error-msg"></span>
     </div>
@@ -353,30 +362,56 @@
 <div id="toast"></div>
 
 <script>
-function ts() {
-  const d = new Date();
-  return d.toTimeString().split(' ')[0] + '.' + String(d.getMilliseconds()).padStart(3,'0');
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  if (!t) return;
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
 }
-function addLog(logId, event, detail) {
-  const log = document.getElementById(logId);
-  const entry = document.createElement('div');
-  entry.className = 'log-entry';
-  entry.innerHTML = `<span class="log-ts">${ts()}</span><span class="log-event">${event}</span><span class="log-detail">${detail}</span>`;
-  log.prepend(entry);
-}
-function clearLog(id) { document.getElementById(id).innerHTML = ''; }
 function s1log(ev, detail) { addLog('s1-log', ev, detail); }
+function isValidEmail(v) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
 
 function s1onInput() {
   const input = document.getElementById('email-input');
+  input.classList.remove('invalid');
+  document.getElementById('error-msg').textContent = '';
   s1log('input', input.value || '(empty)');
 }
 
+function s1submit() {
+  const input = document.getElementById('email-input');
+  const err = document.getElementById('error-msg');
+  const val = input.value.trim();
+  if (!val) {
+    input.classList.add('invalid');
+    err.textContent = 'Please enter an email address.';
+    s1log('submit', 'BLOCKED — empty field');
+    return;
+  }
+  if (!isValidEmail(val)) {
+    input.classList.add('invalid');
+    err.textContent = 'Please enter a valid email address.';
+    s1log('submit', 'BLOCKED — invalid: ' + val);
+    return;
+  }
+  s1log('submit', '✓ Subscribed: ' + val);
+  showToast('✓ Subscribed: ' + val);
+  input.value = '';
+  err.textContent = '';
+  input.classList.remove('invalid');
+}
+
 function s1reset() {
-  document.getElementById('email-input').value = '';
+  const input = document.getElementById('email-input');
+  input.value = '';
+  input.classList.remove('invalid');
   document.getElementById('error-msg').textContent = '';
   clearLog('s1-log');
 }
 </script>
+
+<script src="logger.js"></script>
 </body>
 </html>

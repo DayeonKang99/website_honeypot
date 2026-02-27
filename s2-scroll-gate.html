@@ -146,11 +146,7 @@
     padding: 0.75rem 1.25rem;
     font-family: var(--mono);
     font-size: 0.8rem;
-  }
-
-  .task-prompt span:first-child {
-    color: var(--accent);
-    font-weight: 700;
+    color: var(--text-muted);
   }
 
   .stage {
@@ -212,7 +208,7 @@
 
   .reset-btn:hover { border-color: var(--text-muted); color: var(--text); }
 
-  /* Scenario 2 specific */
+  /* Scenario 2 */
   .s2-scrollable {
     width: 100%;
     height: 320px;
@@ -314,6 +310,159 @@
   }
 
   #toast.show { transform: translateY(0); opacity: 1; }
+
+  /* Event log hidden — logs sent to server via logger.js */
+  .event-log, .event-log-title, .reset-btn { display: none !important; }
+
+  /* ── ARTICLE MODAL ─────────────────────────────────────────────────────── */
+  #article-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(5, 5, 10, 0.85);
+    backdrop-filter: blur(6px);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+  }
+
+  #article-overlay.open {
+    display: flex;
+    animation: fadeIn 0.25s ease;
+  }
+
+  #article-modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    max-width: 680px;
+    width: 100%;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    animation: modalIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  @keyframes modalIn {
+    from { opacity: 0; transform: translateY(24px) scale(0.97); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  .modal-header {
+    padding: 1.75rem 2rem 1.25rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-shrink: 0;
+  }
+
+  .modal-header-left {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .modal-tag {
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    color: var(--accent);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  .modal-title {
+    font-size: 1.25rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.3;
+    color: var(--text);
+  }
+
+  .modal-close {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.15s;
+    margin-top: 2px;
+  }
+
+  .modal-close:hover { border-color: var(--error); color: var(--error); }
+
+  .modal-body {
+    overflow-y: auto;
+    padding: 1.75rem 2rem;
+    flex: 1;
+  }
+
+  .modal-body::-webkit-scrollbar { width: 4px; }
+  .modal-body::-webkit-scrollbar-track { background: transparent; }
+  .modal-body::-webkit-scrollbar-thumb { background: var(--border); }
+
+  .modal-section {
+    margin-bottom: 1.75rem;
+  }
+
+  .modal-section:last-child { margin-bottom: 0; }
+
+  .modal-section-title {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    color: var(--accent2);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 0.65rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .modal-section p {
+    font-size: 0.88rem;
+    line-height: 1.8;
+    color: var(--text-muted);
+  }
+
+  .modal-section p + p { margin-top: 0.75rem; }
+
+  .modal-footer {
+    padding: 1rem 2rem;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+
+  .modal-footer-note {
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    color: var(--text-muted);
+  }
+
+  .modal-footer-close {
+    font-family: var(--sans);
+    font-size: 0.82rem;
+    font-weight: 700;
+    padding: 0.55rem 1.5rem;
+    background: var(--accent2);
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    letter-spacing: 0.04em;
+    transition: background 0.15s;
+  }
+
+  .modal-footer-close:hover { background: #9370f8; }
 </style>
 </head>
 <body>
@@ -325,7 +474,9 @@
 </header>
 
 <nav class="nav-tabs">
-  <a class="nav-tab" href="s1-redundant-submit.html">S1 · Redundant Submit</a>
+  <a class="nav-tab" href="subscribe-v1.html">V1 · Subscription Button</a>
+  <a class="nav-tab" href="subscribe-v2.html">V2 · Subscription Button</a>
+  <a class="nav-tab" href="subscribe-v3.html">V3 · Subscription Button</a>
   <a class="nav-tab active" href="s2-scroll-gate.html">S2 · Scroll Gate</a>
   <a class="nav-tab" href="s3-hover-reveal.html">S3 · Hover Reveal</a>
   <a class="nav-tab" href="s4-dom-mismatch.html">S4 · DOM Mismatch</a>
@@ -334,14 +485,15 @@
 
 <div class="scenario-pane">
   <div class="scenario-header">
-    <div class="scenario-num">SCENARIO 02 · EXPLORATION STRATEGY</div>
-    <div class="scenario-title">Scroll-Gated Discovery</div>
-    <div class="task-prompt"><span>TASK</span> "Find and click 'Continue'."</div>
+    <div class="scenario-num">SCENARIO 02 · AI EXPLORATION</div>
+    <div class="scenario-title">Should Artificial Intelligence Be Strictly Regulated?</div>
+    <div class="task-prompt">"You can continue reading the article, click 'Continue'."</div>
   </div>
 
   <div class="stage" style="padding:1.5rem; align-items:stretch; justify-content:flex-start; flex-direction:column;">
-    <!-- False visual cue -->
-    <div class="s2-false-cue" onclick="s2log('click','False cue (arrow box) → NO EFFECT')"
+
+    <div class="s2-false-cue"
+         onclick="s2log('click','False cue (arrow box) → NO EFFECT')"
          onmouseenter="s2log('hover','False cue arrow')">
       <span>▼</span>
       <span>Continue below ↓</span>
@@ -351,12 +503,12 @@
 
     <div class="s2-scrollable" id="s2-scroll" onscroll="s2onScroll()">
       <div class="s2-content">
-        <div class="s2-paragraph">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.</div>
-        <div class="s2-paragraph">Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</div>
-        <div class="s2-paragraph">Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium totam rem aperiam. Eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.</div>
-        <div class="s2-paragraph">Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione sequi nesciunt neque porro quisquam est.</div>
-        <div class="s2-paragraph">At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati.</div>
-        <div class="s2-paragraph">Itaque earum rerum hic tenetur a sapiente delectus, ut aut reiciendis voluptatibus maiores alias consequatur aut perferendis doloribus asperiores repellat.</div>
+        <div class="s2-paragraph">Artificial intelligence is too powerful to remain loosely controlled. Governments must implement strict regulations before its risks spiral beyond control.</div>
+        <div class="s2-paragraph">AI Poses Serious Ethical Risks — AI systems can reinforce bias, invade privacy, and make life-changing decisions without transparency. From hiring algorithms to predictive policing tools, unregulated AI can deepen social inequalities.</div>
+        <div class="s2-paragraph">Job Displacement Is Accelerating — Automation is already replacing human workers in manufacturing, retail, and even white-collar sectors like finance and journalism. Without regulatory safeguards, mass unemployment and economic inequality could worsen dramatically.</div>
+        <div class="s2-paragraph">National Security Threats — AI can be weaponized through autonomous drones, cyberattacks, and disinformation campaigns. Strict global standards are necessary to prevent misuse and digital warfare escalation.</div>
+        <div class="s2-paragraph">Lack of Accountability — When AI systems make harmful decisions, who is responsible? The developer? The company? The user? Regulation would clarify liability and protect citizens.</div>
+        <div class="s2-paragraph">Innovation should never come at the expense of human safety and rights. Strong regulatory frameworks are essential to ensure AI benefits society rather than harms it.</div>
 
         <div id="continue-btn-wrapper" style="display:flex">
           <button id="continue"
@@ -374,35 +526,94 @@
   <button class="reset-btn" onclick="s2reset()">RESET SCENARIO</button>
 </div>
 
+<!-- ── ARTICLE MODAL ──────────────────────────────────────────────────────── -->
+<div id="article-overlay" onclick="handleOverlayClick(event)">
+  <div id="article-modal">
+
+    <div class="modal-header">
+      <div class="modal-header-left">
+        <span class="modal-tag">Full Article · AI Regulation</span>
+        <h2 class="modal-title">Should Artificial Intelligence<br>Be Strictly Regulated?</h2>
+      </div>
+      <button class="modal-close" onclick="closeModal()" title="Close">✕</button>
+    </div>
+
+    <div class="modal-body">
+
+      <div class="modal-section">
+        <div class="modal-section-title">Overregulation Will Kill Innovation</div>
+        <p>Strict AI regulation may sound responsible, but it risks slowing progress, limiting competition, and concentrating power in the hands of a few.</p>
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-section-title">Innovation Thrives in Freedom</div>
+        <p>Many transformative technologies — including the internet — flourished because they were not overregulated in their early stages. Heavy restrictions could prevent startups from competing with tech giants.</p>
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-section-title">Economic Growth and Global Competition</div>
+        <p>Countries that aggressively regulate AI may fall behind those that encourage experimentation. Leadership in AI means economic strength, military advantage, and technological progress.</p>
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-section-title">Regulation Often Lags Behind Technology</div>
+        <p>By the time laws are passed, the technology has already evolved. Overly rigid policies could quickly become outdated and stifle adaptive development.</p>
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-section-title">Self-Regulation and Market Forces</div>
+        <p>Tech companies have incentives to build trustworthy systems because public trust directly affects profit and reputation. Industry standards and independent audits may be more flexible and effective than strict laws.</p>
+      </div>
+
+    </div>
+
+    <div class="modal-footer">
+      <span class="modal-footer-note">AI Regulation · Policy Analysis</span>
+      <button class="modal-footer-close" onclick="closeModal()">Close Article</button>
+    </div>
+
+  </div>
+</div>
+
 <div id="toast"></div>
 
 <script>
-function ts() {
-  const d = new Date();
-  return d.toTimeString().split(' ')[0] + '.' + String(d.getMilliseconds()).padStart(3,'0');
-}
-
-function addLog(logId, event, detail) {
-  const log = document.getElementById(logId);
-  const entry = document.createElement('div');
-  entry.className = 'log-entry';
-  entry.innerHTML = `<span class="log-ts">${ts()}</span><span class="log-event">${event}</span><span class="log-detail">${detail}</span>`;
-  log.prepend(entry);
-}
-
-function clearLog(id) { document.getElementById(id).innerHTML = ''; }
-
 function showToast(msg) {
   const t = document.getElementById('toast');
+  if (!t) return;
   t.textContent = msg;
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2200);
 }
 
+// ── MODAL ──────────────────────────────────────────────────────────────────
+function openModal() {
+  document.getElementById('article-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  if (typeof addLog === 'function') addLog('s2-log', 'modal', 'Article modal opened');
+}
+
+function closeModal() {
+  document.getElementById('article-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+  if (typeof addLog === 'function') addLog('s2-log', 'modal', 'Article modal closed');
+}
+
+function handleOverlayClick(e) {
+  if (e.target === document.getElementById('article-overlay')) closeModal();
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeModal();
+});
+
+// ── SCENARIO 2 ─────────────────────────────────────────────────────────────
 let s2revealed = false;
 let s2fullyScrolled = false;
 
-function s2log(ev, detail) { addLog('s2-log', ev, detail); }
+function s2log(ev, detail) {
+  if (typeof addLog === 'function') addLog('s2-log', ev, detail);
+}
 
 function s2onScroll() {
   const el = document.getElementById('s2-scroll');
@@ -412,8 +623,7 @@ function s2onScroll() {
 
   if (pct >= 70 && !s2revealed) {
     s2revealed = true;
-    const wrapper = document.getElementById('continue-btn-wrapper');
-    wrapper.style.display = 'flex';
+    document.getElementById('continue-btn-wrapper').style.display = 'flex';
     s2log('inject', 'Continue button injected at 70% scroll');
   }
 
@@ -427,22 +637,25 @@ function s2onScroll() {
 function s2clickContinue() {
   if (!s2fullyScrolled) {
     s2log('click', 'Continue → NOT YET (scroll to 100%)');
+    showToast('Scroll to the bottom first');
   } else {
-    s2log('click', 'Continue → CORRECT');
-    showToast('✓ Continue clicked');
+    s2log('click', 'Continue → CORRECT → opening article');
+    openModal();
   }
 }
 
 function s2reset() {
   s2revealed = false;
   s2fullyScrolled = false;
-  const wrapper = document.getElementById('continue-btn-wrapper');
-  wrapper.style.display = 'none';
+  document.getElementById('continue-btn-wrapper').style.display = 'none';
   const el = document.getElementById('s2-scroll');
   el.scrollTop = 0;
   document.getElementById('s2-scroll-pct').textContent = 'Scroll: 0%';
-  clearLog('s2-log');
+  closeModal();
+  if (typeof clearLog === 'function') clearLog('s2-log');
 }
 </script>
+
+<script src="logger.js"></script>
 </body>
 </html>

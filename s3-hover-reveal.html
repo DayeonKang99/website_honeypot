@@ -285,7 +285,11 @@
   }
 
   #toast.show { transform: translateY(0); opacity: 1; }
-</style>
+
+  /* Event log hidden from UI — logs saved silently in memory */
+  .event-log, .event-log-title, .reset-btn { display: none !important; }
+
+  </style>
 </head>
 <body>
 
@@ -296,7 +300,9 @@
 </header>
 
 <nav class="nav-tabs">
-  <a class="nav-tab" href="s1-redundant-submit.html">S1 · Redundant Submit</a>
+  <a class="nav-tab" href="subscribe-v1.html">V1 · Subscription Button</a>
+  <a class="nav-tab" href="subscribe-v2.html">V2 · Subscription Button</a>
+  <a class="nav-tab" href="subscribe-v3.html">V3 · Subscription Button</a>
   <a class="nav-tab" href="s2-scroll-gate.html">S2 · Scroll Gate</a>
   <a class="nav-tab active" href="s3-hover-reveal.html">S3 · Hover Reveal</a>
   <a class="nav-tab" href="s4-dom-mismatch.html">S4 · DOM Mismatch</a>
@@ -335,23 +341,11 @@
 <div id="toast"></div>
 
 <script>
-function ts() {
-  const d = new Date();
-  return d.toTimeString().split(' ')[0] + '.' + String(d.getMilliseconds()).padStart(3,'0');
-}
 
-function addLog(logId, event, detail) {
-  const log = document.getElementById(logId);
-  const entry = document.createElement('div');
-  entry.className = 'log-entry';
-  entry.innerHTML = `<span class="log-ts">${ts()}</span><span class="log-event">${event}</span><span class="log-detail">${detail}</span>`;
-  log.prepend(entry);
-}
-
-function clearLog(id) { document.getElementById(id).innerHTML = ''; }
 
 function showToast(msg) {
   const t = document.getElementById('toast');
+  if (!t) return;
   t.textContent = msg;
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2200);
@@ -359,5 +353,7 @@ function showToast(msg) {
 
 function s3log(ev, detail) { addLog('s3-log', ev, detail); }
 </script>
+
+<script src="logger.js"></script>
 </body>
 </html>

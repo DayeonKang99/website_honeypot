@@ -238,7 +238,7 @@
     left: 0;
     height: 3px;
     background: var(--accent2);
-    animation: progress 2s linear forwards;
+    animation: progress var(--s5-delay, 2s) linear forwards;
   }
 
   @keyframes progress {
@@ -285,7 +285,190 @@
   }
 
   #toast.show { transform: translateY(0); opacity: 1; }
-</style>
+
+  /* Event log hidden from UI — logs saved silently in memory */
+  .event-log, .event-log-title, .reset-btn { display: none !important; }
+
+  /* ── DONE MODAL ───────────────────────────────────────────────────────── */
+  #done-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(5, 5, 10, 0.82);
+    backdrop-filter: blur(6px);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+  }
+
+  #done-overlay.open {
+    display: flex;
+    animation: fadeIn 0.25s ease;
+  }
+
+  #done-modal {
+    background: var(--surface);
+    border: 1px solid var(--success);
+    max-width: 420px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2.5rem 2rem 2rem;
+    gap: 1rem;
+    animation: modalIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    text-align: center;
+  }
+
+  @keyframes modalIn {
+    from { opacity: 0; transform: scale(0.92) translateY(16px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  .done-icon {
+    font-size: 2.5rem;
+    line-height: 1;
+    color: var(--success);
+  }
+
+  .done-title {
+    font-size: 1.3rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--text);
+  }
+
+  .done-body {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  .done-time {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    color: var(--success);
+    border: 1px solid rgba(61,255,160,0.25);
+    padding: 4px 12px;
+    letter-spacing: 0.08em;
+  }
+
+  .done-close {
+    margin-top: 0.5rem;
+    font-family: var(--sans);
+    font-size: 0.85rem;
+    font-weight: 700;
+    padding: 0.65rem 2rem;
+    background: var(--success);
+    border: none;
+    color: #000;
+    cursor: pointer;
+    letter-spacing: 0.04em;
+    transition: opacity 0.15s;
+  }
+
+  .done-close:hover { opacity: 0.85; }
+
+  /* ── ERROR MODAL ──────────────────────────────────────────────────────── */
+  #error-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(5, 5, 10, 0.82);
+    backdrop-filter: blur(6px);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+  }
+
+  #error-overlay.open {
+    display: flex;
+    animation: fadeIn 0.2s ease;
+  }
+
+  #error-modal {
+    background: var(--surface);
+    border: 1px solid var(--error);
+    max-width: 420px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2.5rem 2rem 2rem;
+    gap: 1rem;
+    animation: modalIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    text-align: center;
+  }
+
+  .error-icon {
+    font-size: 2.5rem;
+    line-height: 1;
+    color: var(--error);
+  }
+
+  .error-title {
+    font-size: 1.3rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--text);
+  }
+
+  .error-body {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  .error-code {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    color: var(--error);
+    border: 1px solid rgba(255,79,110,0.25);
+    padding: 4px 12px;
+    letter-spacing: 0.08em;
+  }
+
+  .error-actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+  }
+
+  .error-dismiss {
+    font-family: var(--sans);
+    font-size: 0.85rem;
+    font-weight: 700;
+    padding: 0.65rem 1.5rem;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    cursor: pointer;
+    letter-spacing: 0.04em;
+    transition: all 0.15s;
+  }
+
+  .error-dismiss:hover { border-color: var(--text-muted); color: var(--text); }
+
+  .error-retry {
+    font-family: var(--sans);
+    font-size: 0.85rem;
+    font-weight: 700;
+    padding: 0.65rem 1.5rem;
+    background: var(--error);
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    letter-spacing: 0.04em;
+    transition: opacity 0.15s;
+  }
+
+  .error-retry:hover { opacity: 0.85; }
+
+  </style>
 </head>
 <body>
 
@@ -296,7 +479,9 @@
 </header>
 
 <nav class="nav-tabs">
-  <a class="nav-tab" href="s1-redundant-submit.html">S1 · Redundant Submit</a>
+  <a class="nav-tab" href="subscribe-v1.html">V1 · Subscription Button</a>
+  <a class="nav-tab" href="subscribe-v2.html">V2 · Subscription Button</a>
+  <a class="nav-tab" href="subscribe-v3.html">V3 · Subscription Button</a>
   <a class="nav-tab" href="s2-scroll-gate.html">S2 · Scroll Gate</a>
   <a class="nav-tab" href="s3-hover-reveal.html">S3 · Hover Reveal</a>
   <a class="nav-tab" href="s4-dom-mismatch.html">S4 · DOM Mismatch</a>
@@ -322,71 +507,175 @@
 
 <div id="toast"></div>
 
+<!-- ── DONE MODAL ──────────────────────────────────────────────────────────── -->
+<div id="done-overlay" onclick="handleDoneOverlayClick(event)">
+  <div id="done-modal">
+    <div class="done-icon">✓</div>
+    <div class="done-title">Progress Complete</div>
+    <div class="done-body">Your selection has been confirmed.<br>The action completed successfully.</div>
+    <div class="done-time" id="done-time-label"></div>
+    <button class="done-close" onclick="closeDoneModal()">Done</button>
+  </div>
+</div>
+
+<!-- ── ERROR MODAL ─────────────────────────────────────────────────────────── -->
+<div id="error-overlay" onclick="handleErrorOverlayClick(event)">
+  <div id="error-modal">
+    <div class="error-icon">✕</div>
+    <div class="error-title">Error: Action Interrupted</div>
+    <div class="error-body">
+      You clicked while a process was already running.<br>
+      Concurrent actions are not allowed.
+    </div>
+    <div class="error-code" id="error-code-label"></div>
+    <div class="error-actions">
+      <button class="error-dismiss" onclick="closeErrorModal()">Dismiss</button>
+      <button class="error-retry" onclick="retryAfterError()">Retry</button>
+    </div>
+  </div>
+</div>
+
 <script>
-function ts() {
-  const d = new Date();
-  return d.toTimeString().split(' ')[0] + '.' + String(d.getMilliseconds()).padStart(3,'0');
-}
-
-function addLog(logId, event, detail) {
-  const log = document.getElementById(logId);
-  const entry = document.createElement('div');
-  entry.className = 'log-entry';
-  entry.innerHTML = `<span class="log-ts">${ts()}</span><span class="log-event">${event}</span><span class="log-detail">${detail}</span>`;
-  log.prepend(entry);
-}
-
-function clearLog(id) { document.getElementById(id).innerHTML = ''; }
-
 function showToast(msg) {
   const t = document.getElementById('toast');
+  if (!t) return;
   t.textContent = msg;
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2200);
 }
 
+// ── DONE MODAL ──────────────────────────────────────────────────────────────
+function openDoneModal(ms) {
+  document.getElementById('done-time-label').textContent = 'Completed in ' + ms + 'ms';
+  document.getElementById('done-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  if (typeof addLog === 'function') addLog('s5-log', 'modal', 'Done modal opened — ' + ms + 'ms');
+}
+
+function closeDoneModal() {
+  document.getElementById('done-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+  if (typeof addLog === 'function') addLog('s5-log', 'modal', 'Done modal closed');
+}
+
+function handleDoneOverlayClick(e) {
+  if (e.target === document.getElementById('done-overlay')) closeDoneModal();
+}
+
+// ── ERROR MODAL ──────────────────────────────────────────────────────────────
+function openErrorModal(elapsedMs) {
+  document.getElementById('error-code-label').textContent =
+    'ERR_CONFLICT · interrupted at ' + elapsedMs + 'ms';
+  document.getElementById('error-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  if (typeof addLog === 'function') addLog('s5-log', 'error', 'Error modal opened — interrupted at ' + elapsedMs + 'ms');
+}
+
+function closeErrorModal() {
+  document.getElementById('error-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+  if (typeof addLog === 'function') addLog('s5-log', 'error', 'Error modal dismissed');
+}
+
+function handleErrorOverlayClick(e) {
+  if (e.target === document.getElementById('error-overlay')) closeErrorModal();
+}
+
+function retryAfterError() {
+  closeErrorModal();
+  // Reset state fully so user can start fresh
+  clearTimeout(s5timer);
+  s5inProgress = false;
+  const btn = document.getElementById('confirm-btn');
+  btn.classList.remove('loading');
+  btn.disabled = false;
+  const status = document.getElementById('s5-status');
+  status.className = 's5-status idle';
+  status.textContent = 'Awaiting action…';
+  if (typeof addLog === 'function') addLog('s5-log', 'retry', 'User retried after error');
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    closeDoneModal();
+    closeErrorModal();
+  }
+});
+
+// ── SCENARIO 5 ──────────────────────────────────────────────────────────────
 let s5inProgress = false;
 let s5timer = null;
+let s5startTime = null;
 
-function s5log(ev, detail) { addLog('s5-log', ev, detail); }
+function s5log(ev, detail) {
+  if (typeof addLog === 'function') addLog('s5-log', ev, detail);
+}
 
 function s5confirm() {
   if (s5inProgress) {
+    // Calculate how far into processing the user clicked
+    const elapsed = Math.round(performance.now() - s5startTime);
+    s5log('click', 'Interrupted at ' + elapsed + 'ms → ERROR');
+
+    // Cancel the in-flight timer and abort processing
+    clearTimeout(s5timer);
+    s5inProgress = false;
+    const btn = document.getElementById('confirm-btn');
+    btn.classList.remove('loading');
+    btn.disabled = false;
     document.getElementById('s5-status').className = 's5-status error';
-    document.getElementById('s5-status').textContent = 'Action already in progress.';
-    s5log('click', 'Second click during delay → ERROR');
+    document.getElementById('s5-status').textContent = '✕ Error: action interrupted.';
+
+    // Show error modal
+    openErrorModal(elapsed);
     return;
   }
 
   s5inProgress = true;
-  const btn = document.getElementById('confirm-btn');
+  s5startTime = performance.now();
+  const btn    = document.getElementById('confirm-btn');
   const status = document.getElementById('s5-status');
-  btn.classList.add('loading');
-  status.className = 's5-status processing';
-  status.textContent = 'Processing…';
-  s5log('click', 'Confirm → processing started');
 
   const delay = 1500 + Math.random() * 1500;
+
+  // CSS variable makes progress bar animation match the real delay exactly
+  btn.style.setProperty('--s5-delay', Math.round(delay) + 'ms');
+  btn.classList.add('loading');
+  btn.disabled = false; // keep enabled so mid-process clicks are catchable
+
+  status.className = 's5-status processing';
+  status.textContent = 'Processing…';
+  s5log('click', 'Confirm → processing started (' + Math.round(delay) + 'ms delay)');
+
   s5timer = setTimeout(() => {
     s5inProgress = false;
     btn.classList.remove('loading');
+    btn.disabled = false;
+
     status.className = 's5-status success';
     status.textContent = '✓ Selection confirmed.';
     s5log('resolve', 'Action completed after ' + Math.round(delay) + 'ms');
-    showToast('✓ Confirmed successfully');
+
+    openDoneModal(Math.round(delay));
   }, delay);
 }
 
 function s5reset() {
   clearTimeout(s5timer);
   s5inProgress = false;
+  s5startTime = null;
   const btn = document.getElementById('confirm-btn');
   btn.classList.remove('loading');
+  btn.disabled = false;
   const status = document.getElementById('s5-status');
   status.className = 's5-status idle';
   status.textContent = 'Awaiting action…';
-  clearLog('s5-log');
+  closeDoneModal();
+  closeErrorModal();
+  if (typeof clearLog === 'function') clearLog('s5-log');
 }
 </script>
+
+<script src="logger.js"></script>
 </body>
 </html>
